@@ -19,3 +19,15 @@ export async function getHotels(req: AuthenticatedRequest, res: Response) {
     return res.sendStatus(httpStatus.NOT_FOUND);
   }
 }
+export async function getRooms(req: AuthenticatedRequest, res: Response) {
+  const { hotelId } = req.params;
+  const { userId } = req;
+
+  try {
+    const rooms = await hotelsService.getRoomsFromHotelById(Number(hotelId), userId);
+
+    return res.status(httpStatus.OK).send(rooms);
+  } catch (error) {
+    return res.sendStatus(httpStatus.NOT_FOUND);
+  }
+}

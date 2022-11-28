@@ -28,6 +28,11 @@ export async function getRooms(req: AuthenticatedRequest, res: Response) {
 
     return res.status(httpStatus.OK).send(rooms);
   } catch (error) {
-    return res.sendStatus(httpStatus.NOT_FOUND);
+    if (error.name === "NotFoundError") {
+      return res.sendStatus(httpStatus.NOT_FOUND);
+    }
+    if (error.name === "UnauthorizedError") {
+      return res.sendStatus(httpStatus.UNAUTHORIZED);
+    }
   }
 }

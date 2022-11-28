@@ -92,6 +92,40 @@ describe("GET /hotels", () => {
       ]);
     });
 
+    it("should respond with status 200 and a empty array when there is no hotels", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const enrollment = await prisma.enrollment.create({
+        data: {
+          name: "user",
+          cpf: "123",
+          birthday: faker.date.past(),
+          phone: "123456",
+          userId: user.id,
+        },
+      });
+      const ticketType = await prisma.ticketType.create({
+        data: {
+          name: "nice ticket",
+          price: 120,
+          isRemote: false,
+          includesHotel: true,
+        },
+      });
+      await prisma.ticket.create({
+        data: {
+          ticketTypeId: ticketType.id,
+          enrollmentId: enrollment.id,
+          status: "PAID",
+        },
+      });
+
+      const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
+
+      expect(response.status).toBe(httpStatus.OK);
+      expect(response.body).toEqual([]);
+    });
+
     it("should respond with status 401 if ticket is not paid", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
